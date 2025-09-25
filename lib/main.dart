@@ -11,7 +11,6 @@ import 'package:micro_mobility_app/providers/shift_provider.dart';
 
 // Services
 import 'package:micro_mobility_app/services/api_service.dart';
-import 'package:micro_mobility_app/services/websocket/global_websocket_service.dart';
 import 'package:micro_mobility_app/services/websocket/location_tracking_service.dart';
 
 // Screens
@@ -35,14 +34,7 @@ void main() async {
   final _apiService = ApiService();
   final _prefs = await SharedPreferences.getInstance();
 
-  // Инициализация сервисов
-  // final _globalWebSocketService = GlobalWebSocketService(); //снять для подключение wss
   final _locationTrackingService = LocationTrackingService();
-
-  // 🔗 СВЯЗКА: при обновлении локации — отправляем в WebSocket
-  _locationTrackingService.setLocationUpdateCallback((location) {
-    // _globalWebSocketService.updateCurrentLocation(location); //снять для подключение wss
-  });
 
   runApp(
     MultiProvider(
@@ -55,8 +47,6 @@ void main() async {
             prefs: _prefs,
           ),
         ),
-        // Предоставляем сервисы как singleton'ы
-        // Provider.value(value: _globalWebSocketService), //снять для подключение wss
         Provider.value(value: _locationTrackingService),
       ],
       child: const MyApp(),
@@ -74,18 +64,17 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Оператор микромобильности',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-            seedColor: appColor, brightness: Brightness.light),
+        colorScheme: ColorScheme.fromSeed(seedColor: appColor),
         scaffoldBackgroundColor: Colors.grey[100],
-        appBarTheme: AppBarTheme(
+        appBarTheme: const AppBarTheme(
           foregroundColor: Colors.white,
           elevation: 1,
-          titleTextStyle: const TextStyle(
+          titleTextStyle: TextStyle(
             color: Colors.black,
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
-          iconTheme: const IconThemeData(color: Colors.white),
+          iconTheme: IconThemeData(color: Colors.white),
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
@@ -97,7 +86,7 @@ class MyApp extends StatelessWidget {
             ),
           ),
         ),
-        cardTheme: const CardThemeData(
+        cardTheme: const CardTheme(
           elevation: 1,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(16)),
@@ -118,7 +107,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       initialRoute: '/splash',
       routes: {
-        '/splash': (context) => const SplashScreen(),
+        '/splash': (context) => SplashScreen(), // ← УБРАН const
         '/login': (context) => const LoginScreen(),
         '/dashboard': (context) => const DashboardScreen(),
         '/profile': (context) => const ProfileScreen(),
