@@ -34,7 +34,13 @@ void main() async {
   final _apiService = ApiService();
   final _prefs = await SharedPreferences.getInstance();
 
+  // Инициализация сервисов
   final _locationTrackingService = LocationTrackingService();
+
+  // 🔗 СВЯЗКА: при обновлении локации — отправляем в WebSocket
+  _locationTrackingService.setLocationUpdateCallback((location) {
+    // _globalWebSocketService.updateCurrentLocation(location); //снять для подключение wss
+  });
 
   runApp(
     MultiProvider(
@@ -64,17 +70,20 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Оператор микромобильности',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: appColor),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: appColor,
+          brightness: Brightness.light,
+        ),
         scaffoldBackgroundColor: Colors.grey[100],
-        appBarTheme: const AppBarTheme(
+        appBarTheme: AppBarTheme(
           foregroundColor: Colors.white,
           elevation: 1,
-          titleTextStyle: TextStyle(
+          titleTextStyle: const TextStyle(
             color: Colors.black,
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
-          iconTheme: IconThemeData(color: Colors.white),
+          iconTheme: const IconThemeData(color: Colors.white),
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
@@ -86,7 +95,7 @@ class MyApp extends StatelessWidget {
             ),
           ),
         ),
-        cardTheme: const CardTheme(
+        cardTheme: const CardThemeData( // ✅ ИСПРАВЛЕНО: CardThemeData, а не CardTheme
           elevation: 1,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(16)),
@@ -107,7 +116,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       initialRoute: '/splash',
       routes: {
-        '/splash': (context) => SplashScreen(), // ← УБРАН const
+        '/splash': (context) => SplashScreen(), // ❌ УБРАН const — важно!
         '/login': (context) => const LoginScreen(),
         '/dashboard': (context) => const DashboardScreen(),
         '/profile': (context) => const ProfileScreen(),
